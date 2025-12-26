@@ -1,0 +1,7 @@
+@QuickPass.API_HostAddress = http://localhost:5266
+
+POST {{QuickPass.API_HostAddress}}/api/Tickets
+Accept: application/json
+Content-Type: application/json
+
+###
