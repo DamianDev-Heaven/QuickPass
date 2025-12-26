@@ -20,10 +20,10 @@ namespace QuickPass.API.Controllers
             var ticket = new Ticket
             {
                 TicketsId = Guid.NewGuid(),
-                title = "1er",
-                description = "test",
+                Title = "1er",
+                Description = "test",
                 CustomerId = Guid.NewGuid(),
-                status = TicketStatus.Abierto
+                Status = TicketStatus.Abierto
             };
             var result = await _repo.AddAsync(ticket);
             return Ok(result);
