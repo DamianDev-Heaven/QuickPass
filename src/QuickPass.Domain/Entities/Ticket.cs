@@ -9,9 +9,9 @@ namespace QuickPass.Domain.Entities
     public class Ticket
     {
         public Guid TicketsId { get; set; } = Guid.NewGuid();
-        public string title { get; set; } = string.Empty;
-        public string description { get; set; }
-        public TicketStatus status { get; set; } = TicketStatus.Abierto;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; }
+        public TicketStatus Status { get; set; } = TicketStatus.Abierto;
         public Guid CustomerId { get; set; }
         public Guid? TechId { get; set; }
     }

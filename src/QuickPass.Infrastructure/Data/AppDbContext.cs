@@ -10,21 +10,32 @@ public class AppDbContext : DbContext
     {
     }
     public DbSet<Ticket> tickets {  get; set; }
+    public DbSet<Roles> roles { get; set; }
+    public DbSet<Account> account { get; set; }
+    public DbSet<Users> users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Ticket>(entity =>
+        modelBuilder.Entity<Ticket>(entity => //Tickets
         {
             entity.ToTable("tickets");
             entity.HasKey(e => e.TicketsId);
             entity.Property(e => e.TicketsId).HasColumnName("id_ticket").HasColumnType("BINARY(16)").IsRequired();
-            entity.Property(e => e.title).HasColumnName("title").HasMaxLength(200).IsRequired();
-            entity.Property(e => e.description).HasColumnName("description").HasColumnType("TEXT");
-            entity.Property(e => e.status).HasColumnName("status").HasColumnType("ENUM('Abierto', 'Asignado','En proceso','Resuelto','Cerrado')")
+            entity.Property(e => e.Title).HasColumnName("title").HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasColumnName("description").HasColumnType("TEXT");
+            entity.Property(e => e.Status).HasColumnName("status").HasColumnType("ENUM('Abierto', 'Asignado','En proceso','Resuelto','Cerrado')")
             .HasConversion(v => v == TicketStatus.Enproceso ? "En proceso" : v.ToString(),v => v == "En proceso" ? TicketStatus.Enproceso : Enum.Parse<TicketStatus>(v));
             entity.Property(e => e.CustomerId).HasColumnName("customer_id").HasColumnType("BINARY(16)").IsRequired();
             entity.Property(e => e.TechId).HasColumnName("tech_id").HasColumnType("BINARY(16)");
+        });        
+        modelBuilder.Entity<Roles>(entity => // Roles
+        {
+            entity.ToTable("roles");
+            entity.HasKey(r => r.idRol);
+            entity.Property(r => r.idRol).HasColumnName("id_rol").HasColumnType("BINARY(16)").IsRequired();
+            entity.Property(r => r.NameRol).HasColumnName("name_rol").HasMaxLength(50).IsRequired();
         });
+        
     }
 }
