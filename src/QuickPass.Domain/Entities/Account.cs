@@ -15,6 +15,8 @@ namespace QuickPass.Domain.Entities
         public Guid RolId { get; set; }
         // Navegacion
         public virtual Roles? Role { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
     }
 }

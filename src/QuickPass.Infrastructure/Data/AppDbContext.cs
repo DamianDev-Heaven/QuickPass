@@ -34,8 +34,31 @@ public class AppDbContext : DbContext
             entity.ToTable("roles");
             entity.HasKey(r => r.idRol);
             entity.Property(r => r.idRol).HasColumnName("id_rol").HasColumnType("BINARY(16)").IsRequired();
-            entity.Property(r => r.NameRol).HasColumnName("name_rol").HasMaxLength(50).IsRequired();
+            entity.Property(r => r.NameRol).HasColumnName("name_rol").HasColumnType("ENUM('Administrador', 'Tecnico', 'Usuario')")
+            .HasConversion(v => v.ToString(), v => Enum.Parse<RoleNames>(v));
         });
-        
+        modelBuilder.Entity<Account>(entity => // Account
+        {
+            entity.ToTable("accounts");
+            entity.HasKey(a => a.accId);
+            entity.Property(a => a.accId).HasColumnName("id_acc").HasColumnType("BINARY(16)").IsRequired();
+            entity.Property(a => a.Email).HasColumnName("email").HasMaxLength(100).IsRequired();
+            entity.Property(a => a.Pass).HasColumnName("pass").HasMaxLength(256).IsRequired();
+            entity.Property(a => a.RolId).HasColumnName("rol_id").HasColumnType("BINARY(16)");
+            entity.HasOne(d => d.Role).WithMany().HasForeignKey(d => d.RolId).OnDelete(DeleteBehavior.Restrict);
+            entity.Property(a => a.CreatedAt).HasColumnName("created_at").HasColumnType("TIMESTAMP").ValueGeneratedOnAdd();
+            entity.Property(a => a.UpdatedAt).HasColumnName("updated_at").HasColumnType("TIMESTAMP").ValueGeneratedOnAddOrUpdate();
+        });
+        modelBuilder.Entity<Users>(entity => // Users
+        {
+            entity.ToTable("users");
+            entity.HasKey(u => u.UserId);
+            entity.Property(u => u.UserId).HasColumnName("id_user").HasColumnType("BINARY(16)").IsRequired();
+            entity.Property(u => u.NameUser).HasColumnName("name_user").HasMaxLength(69).IsRequired();
+            entity.Property(u => u.Description).HasColumnName("description").HasMaxLength(255);
+            entity.Property(u => u.UrlPic).HasColumnName("profile_pic");
+            entity.Property(u => u.AccId).HasColumnName("account_id").HasColumnType("BINARY(16)").IsRequired();
+            entity.HasOne(d => d.account).WithOne().HasForeignKey<Users>(d => d.AccId).OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

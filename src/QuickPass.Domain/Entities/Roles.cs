@@ -9,6 +9,10 @@ namespace QuickPass.Domain.Entities
     public class Roles
     {
         public Guid idRol {  get; set; } = Guid.NewGuid();
-        public string NameRol { get; }
+        public RoleNames NameRol {  get; set; }
+    }
+    public enum RoleNames
+    {
+        Administrador,Tecnico,Usuario
     }
 }
