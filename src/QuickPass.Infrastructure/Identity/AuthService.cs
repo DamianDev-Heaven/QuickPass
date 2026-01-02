@@ -40,8 +40,9 @@ namespace QuickPass.Infrastructure.Identity
                 };
                 _appDbContext.users.Add(newUser);
                 await _appDbContext.SaveChangesAsync();
+
                 await transaction.CommitAsync();
-                return newUser.AccId; // P
+                return newUser.UserId; // P
             }
             catch (Exception)
             {
@@ -52,8 +53,22 @@ namespace QuickPass.Infrastructure.Identity
         }
         public async Task<string> Login (LoginRequest request)
         {
-            //Pendiente
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Pass)) throw new ArgumentException($"Email o Contraseña no pueden ir vacias");
+                var acc = await _appDbContext.account.Include(p => p.Role).SingleOrDefaultAsync(p => p.Email == request.Email.ToLower());
+                if (acc == null) throw new ArgumentException($"Revisa Correo o contraseña");
+                var result = _passwordHasher.VerifyHashedPassword(acc, acc.Pass, acc.Pass);
+                if (result == PasswordVerificationResult.Failed) throw new ArgumentException("Revisa correo o contraseña");t
+            } catch (Exception e)
+            {
+                throw new ArgumentException(e.Message, e);
+            }
             throw new NotImplementedException();
+        }
+        public static string Gen (string user)
+        {
+            return "";
         }
     }
 }
