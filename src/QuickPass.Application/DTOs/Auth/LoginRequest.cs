@@ -2,6 +2,7 @@
 {
     public class LoginRequest
     {
-        // Pendiente
+        public string Email { get; set; }
+        public string Pass { get; set; }
     }
 }
