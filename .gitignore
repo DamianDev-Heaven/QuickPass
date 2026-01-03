@@ -9,6 +9,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+# .gitignore
+appsettings.Development.json
+appsettings.Production.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -362,13 +365,13 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 # ---------------------------------------------------------------
-# DOCUMENTACIÓN DE PRUEBAS Y OPTIMIZACIÓN (NO SUBIR A GITHUB)
+# DOCUMENTACIï¿½N DE PRUEBAS Y OPTIMIZACIï¿½N (NO SUBIR A GITHUB)
 # ---------------------------------------------------------------
 
-# Archivo de documentación consolidado
+# Archivo de documentaciï¿½n consolidado
 DOCUMENTACION_OPTIMIZACION_FINAL.txt
 
-# Archivos markdown de documentación técnica
+# Archivos markdown de documentaciï¿½n tï¿½cnica
 *OPTIMIZACION*.md
 *GUIA*.md
 *EJEMPLOS*.md
