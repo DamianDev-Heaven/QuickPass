@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "QuickPass API",
         Version = "v1",
-        Description = "API para gestión de tickets QuickPass"
+        Description = "API para gestiÃ³n de tickets QuickPass"
     });
 
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -61,10 +61,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors("AllowAll");
+
 app.UseHttpsRedirection();
-
-app.UseCors("AllowAll"); 
-
 app.UseAuthentication();
 app.UseAuthorization();
 
