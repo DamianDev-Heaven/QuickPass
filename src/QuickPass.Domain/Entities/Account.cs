@@ -10,7 +10,7 @@ namespace QuickPass.Domain.Entities
     {
         public Guid accId { get; set; } = Guid.NewGuid();
         public string Email {  get; set; } 
-        public string Pass {  get; set; } = string.Empty;
+        public string? Pass {  get; set; } = string.Empty;
         public bool OtherMed { get; set; }
         public Guid RolId { get; set; }
         // Navegacion
