@@ -1,32 +1,47 @@
-﻿using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuickPass.Application.Contracts.Persistence;
-using QuickPass.Domain.Entities;
+using QuickPass.Application.Contracts.Services;
+using QuickPass.Application.DTOs.Tickets;
+using System.Security.Claims;
 
 namespace QuickPass.API.Controllers
 {
     [ApiController]
-    [Route("api/[Controller]")]
+    [Route("api/[controller]")]
+    [Authorize]
     public class TicketsController : ControllerBase
     {
-        private readonly ITicketRepository _repo;
-        public TicketsController(ITicketRepository repo)
+        private readonly ITicketService _ticketService;
+
+        public TicketsController(ITicketService ticketService)
         {
-            _repo = repo;
+            _ticketService = ticketService;
         }
+
         [HttpPost]
-        public async Task<IActionResult> CrearTicket()
+        public async Task<IActionResult> CreateTicket([FromBody] CreateTRequest request)
         {
-            var ticket = new Ticket
+            var accountId = GetAccountIdFromToken();
+            var response = await _ticketService.CreateAsync(request, accountId);
+            return Ok(response);
+        }
+
+        [HttpGet("mine")]
+        public async Task<IActionResult> GetMyTickets()
+        {
+            var accountId = GetAccountIdFromToken();
+            var tickets = await _ticketService.GetMineAsync(accountId);
+            return Ok(tickets);
+        }
+
+        private Guid GetAccountIdFromToken()
+        {
+            var accountIdClaim = User.FindFirstValue("accountId");
+            if (string.IsNullOrEmpty(accountIdClaim) || !Guid.TryParse(accountIdClaim, out var accountId))
             {
-                TicketsId = Guid.NewGuid(),
-                Title = "1er",
-                Description = "test",
-                CustomerId = Guid.NewGuid(),
-                Status = TicketStatus.Abierto
-            };
-            var result = await _repo.AddAsync(ticket);
-            return Ok(result);
+                throw new UnauthorizedAccessException("Token inválido: falta accountId");
+            }
+            return accountId;
         }
     }
 }

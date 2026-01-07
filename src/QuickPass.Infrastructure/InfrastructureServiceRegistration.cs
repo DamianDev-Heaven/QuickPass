@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using QuickPass.Application.Contracts.Identity;
 using QuickPass.Application.Contracts.Persistence;
+using QuickPass.Application.Contracts.Services;
 using QuickPass.Application.DTOs;
+using QuickPass.Application.Services;
 using QuickPass.Domain.Entities;
 using QuickPass.Infrastructure.Data;
 using QuickPass.Infrastructure.Identity;
@@ -24,9 +26,9 @@ namespace QuickPass.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(con, ServerVersion.AutoDetect(con)));
             services.AddScoped<ITicketRepository, TicketRepository>();
-            services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
+            services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<IAuthService, AuthService>();
-            // Configurar JWT desde User Secrets
+            services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
             var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
 
