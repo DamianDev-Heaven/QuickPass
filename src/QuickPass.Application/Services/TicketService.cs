@@ -71,7 +71,7 @@ namespace QuickPass.Application.Services
             }
             return null;
         }
-        public async Task<List<TicketResponse>> GetAllAsync()
+        public async Task<List<TicketResponse>> GetAllAsync() 
         {
             var tickets = await _repo.GetAllAsync();
             return tickets.Select(t => new TicketResponse
@@ -84,8 +84,23 @@ namespace QuickPass.Application.Services
                 TechId = t.TechId
             }).ToList();
         }
+        public async Task AssignTechAsync(Guid ticketId, Guid techId, Guid modifiedBy, string? comment)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+
+            if (ticket == null)
+                throw new InvalidOperationException($"Ticket con ID {ticketId} no encontrado");
+
+            if (ticket.Status != TicketStatus.Abierto)
+                throw new InvalidOperationException($"No se puede asignar un ticket en estado {ticket.Status}");
+
+            if (techId != modifiedBy)
+            { } // Pendiente
+            await _repo.AssignTechAsync(ticketId, techId, modifiedBy, comment);
+        }
+
+
         // pend
-        public Task AssignTechAsync(Guid ticketId, Guid techId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
         public Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
         public Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
         public Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
