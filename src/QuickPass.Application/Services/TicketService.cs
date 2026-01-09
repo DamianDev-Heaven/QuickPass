@@ -54,10 +54,53 @@ namespace QuickPass.Application.Services
             }).ToList();
         }
 
-  // pend
-        public Task<TicketResponse?> GetByIdAsync(Guid id) => throw new NotImplementedException();
-        public Task<List<TicketResponse>> GetAllAsync() => throw new NotImplementedException();
-        public Task AssignTechAsync(Guid ticketId, Guid techId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
+        public async Task<TicketResponse?> GetByIdAsync(Guid id)
+        {
+            var ticket = await _repo.GetByIdAsync(id);
+            if (ticket != null)
+            {
+                return new TicketResponse
+                {
+                    Id = ticket.TicketsId,
+                    Title = ticket.Title,
+                    Description = ticket.Description,
+                    Status = ticket.Status.ToString(),
+                    CustomerId = ticket.CustomerId,
+                    TechId = ticket.TechId
+                };
+            }
+            return null;
+        }
+        public async Task<List<TicketResponse>> GetAllAsync() 
+        {
+            var tickets = await _repo.GetAllAsync();
+            return tickets.Select(t => new TicketResponse
+            {
+                Id = t.TicketsId,
+                Title = t.Title,
+                Description = t.Description,
+                Status = t.Status.ToString(),
+                CustomerId = t.CustomerId,
+                TechId = t.TechId
+            }).ToList();
+        }
+        public async Task AssignTechAsync(Guid ticketId, Guid techId, Guid modifiedBy, string? comment)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+
+            if (ticket == null)
+                throw new InvalidOperationException($"Ticket con ID {ticketId} no encontrado");
+
+            if (ticket.Status != TicketStatus.Abierto)
+                throw new InvalidOperationException($"No se puede asignar un ticket en estado {ticket.Status}");
+
+            if (techId != modifiedBy)
+            { } // Pendiente
+            await _repo.AssignTechAsync(ticketId, techId, modifiedBy, comment);
+        }
+
+
+        // pend
         public Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
         public Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
         public Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();

@@ -33,13 +33,12 @@ namespace QuickPass.Infrastructure.Persistence.Repositories
         public async Task AssignTechAsync(Guid ticketId, Guid techAccountId, Guid modifiedBy, string? comment)
         {
             var ticket = await GetByIdAsync(ticketId);
-            if (ticket != null)
-            {
-                ticket.TechId = techAccountId;
-                ticket.Status = TicketStatus.Asignado;
-                _appDbContext.tickets.Update(ticket);
-                await _appDbContext.SaveChangesAsync();
-            }
+            if (ticket == null)
+                throw new InvalidOperationException($"Ticket con ID {ticketId} no encontrado");
+            ticket.TechId = techAccountId;
+            ticket.Status = TicketStatus.Asignado;
+            _appDbContext.tickets.Update(ticket);
+            await _appDbContext.SaveChangesAsync();
         }
         public async Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment)
         {

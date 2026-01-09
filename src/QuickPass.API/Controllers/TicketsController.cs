@@ -33,7 +33,30 @@ namespace QuickPass.API.Controllers
             var tickets = await _ticketService.GetMineAsync(accountId);
             return Ok(tickets);
         }
-
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var ticket = await _ticketService.GetByIdAsync(id);
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+            return Ok(ticket);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAll() // Funciones para admin 
+        {
+            var tickets = await _ticketService.GetAllAsync();
+            return Ok(tickets);
+        }
+        [HttpPut("{id}/assign-to-me")]
+        [Authorize(Roles = "Tecnico")]
+        public async Task<IActionResult> AssignToMe(Guid id, [FromBody] TicketActionRequest request)
+        {
+            var accountId = GetAccountIdFromToken();
+            await _ticketService.AssignTechAsync(id, accountId, accountId, request.Comment);
+            return NoContent();
+        }
         private Guid GetAccountIdFromToken()
         {
             var accountIdClaim = User.FindFirstValue("accountId");
