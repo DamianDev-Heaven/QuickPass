@@ -9,7 +9,8 @@ namespace QuickPass.Application.Contracts.Persistence
         // READ
         Task<Ticket?> GetByIdAsync(Guid id);
         Task<List<Ticket>> GetMineAsync(Guid customerAccountId);
-        Task<List<Ticket>> GetAllAsync(); // Funcion para admin (tentativa)
+        Task<List<Ticket>> GetAllAsync();
+        Task<List<Ticket>> GetAssignedAsync(Guid techId);
 
         // UPDATE
         Task AssignTechAsync(Guid ticketId, Guid techAccountId, Guid modifiedBy, string? comment);

@@ -70,6 +70,9 @@ namespace QuickPass.Infrastructure.Persistence.Repositories
                 await _appDbContext.SaveChangesAsync();
             }
         }
-        
+        public async Task<List<Ticket>> GetAssignedAsync(Guid techAccountId)
+        {
+            return await _appDbContext.tickets.Where(t => t.TechId == techAccountId).ToListAsync();
+        }
     }
 }

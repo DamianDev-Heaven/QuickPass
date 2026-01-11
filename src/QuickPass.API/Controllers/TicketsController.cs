@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using QuickPass.Application.Contracts.Services;
 using QuickPass.Application.DTOs.Tickets;
-using System.Security.Claims;
 
 namespace QuickPass.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/my-tickets")]
     [Authorize]
-    public class TicketsController : ControllerBase
+    public class TicketsController : BaseApiController
     {
         private readonly ITicketService _ticketService;
 
@@ -21,50 +19,28 @@ namespace QuickPass.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTicket([FromBody] CreateTRequest request)
         {
-            var accountId = GetAccountIdFromToken();
-            var response = await _ticketService.CreateAsync(request, accountId);
-            return Ok(response);
+            var response = await _ticketService.CreateAsync(request, AccountId);
+            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
-        [HttpGet("mine")]
+        [HttpGet]
         public async Task<IActionResult> GetMyTickets()
         {
-            var accountId = GetAccountIdFromToken();
-            var tickets = await _ticketService.GetMineAsync(accountId);
+            var tickets = await _ticketService.GetMineAsync(AccountId);
             return Ok(tickets);
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var ticket = await _ticketService.GetByIdAsync(id);
             if (ticket == null)
-            {
                 return NotFound();
+            if (ticket.CustomerId != AccountId && !IsAdmin && !IsTech)
+            {
+                return Forbid();
             }
             return Ok(ticket);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetAll() // Funciones para admin 
-        {
-            var tickets = await _ticketService.GetAllAsync();
-            return Ok(tickets);
-        }
-        [HttpPut("{id}/assign-to-me")]
-        [Authorize(Roles = "Tecnico")]
-        public async Task<IActionResult> AssignToMe(Guid id, [FromBody] TicketActionRequest request)
-        {
-            var accountId = GetAccountIdFromToken();
-            await _ticketService.AssignTechAsync(id, accountId, accountId, request.Comment);
-            return NoContent();
-        }
-        private Guid GetAccountIdFromToken()
-        {
-            var accountIdClaim = User.FindFirstValue("accountId");
-            if (string.IsNullOrEmpty(accountIdClaim) || !Guid.TryParse(accountIdClaim, out var accountId))
-            {
-                throw new UnauthorizedAccessException("Token inválido: falta accountId");
-            }
-            return accountId;
         }
     }
 }

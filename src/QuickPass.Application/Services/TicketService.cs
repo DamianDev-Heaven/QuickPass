@@ -98,11 +98,39 @@ namespace QuickPass.Application.Services
             { } // Pendiente
             await _repo.AssignTechAsync(ticketId, techId, modifiedBy, comment);
         }
-
-
-        // pend
-        public Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
-        public Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
-        public Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment) => throw new NotImplementedException();
+        public async Task<List<TicketResponse>> GetAssignedAsync(Guid techId)
+        {
+            var tickets = await _repo.GetAssignedAsync(techId);
+            return tickets.Select(t => new TicketResponse
+            {
+                Id = t.TicketsId,
+                Title = t.Title,
+                Description = t.Description,
+                Status = t.Status.ToString(),
+                CustomerId = t.CustomerId,
+                TechId = t.TechId
+            }).ToList();
+        }
+        public async Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+            if (ticket == null)
+                throw new InvalidOperationException($"Ticket con ID {ticketId} no encontrado");
+            await _repo.ResolveAsync(ticketId, modifiedBy, comment);
+        }
+        public async Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+            if (ticket == null)
+                throw new InvalidOperationException($"Ticket con ID {ticketId} no puede cerrarse");
+            await _repo.CloseAsync(ticketId, modifiedBy, comment);
+        }
+        public async Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+            if (ticket == null)
+                throw new InvalidOperationException($"Ticket con ID {ticketId} no puede cerrarse");
+            await _repo.ReopenAsync(ticketId, modifiedBy, comment);
+        }
     }
 }
