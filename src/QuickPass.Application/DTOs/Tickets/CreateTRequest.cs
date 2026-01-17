@@ -11,5 +11,7 @@ namespace QuickPass.Application.DTOs.Tickets
     {
         public string Title { get; set; }
         public string? Description { get; set; }
+        public TicketPriority Priority { get; set; } = TicketPriority.Media;
+        public TicketCategory Category { get; set; } = TicketCategory.General;
     }
 }
