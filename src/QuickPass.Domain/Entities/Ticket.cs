@@ -14,10 +14,29 @@ namespace QuickPass.Domain.Entities
         public TicketStatus Status { get; set; } = TicketStatus.Abierto;
         public Guid CustomerId { get; set; }
         public Guid? TechId { get; set; }
+        public TicketPriority Priority { get; set; } = TicketPriority.Media;
+        public TicketCategory Category { get; set; } = TicketCategory.General;
     }
 
     public enum TicketStatus
     {
         Abierto,Asignado,Enproceso,Resuelto,Cerrado
     }
+    public enum TicketPriority
+    {
+        Baja,
+        Media,
+        Alta,
+        Critica
+    }
+
+    public enum TicketCategory
+    {
+        General,
+        Hardware,
+        Software,
+        Redes,
+        Acceso
+    }
+
 }

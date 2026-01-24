@@ -28,6 +28,8 @@ public class AppDbContext : DbContext
             .HasConversion(v => v == TicketStatus.Enproceso ? "En proceso" : v.ToString(), v => v == "En proceso" ? TicketStatus.Enproceso : Enum.Parse<TicketStatus>(v));
             entity.Property(e => e.CustomerId).HasColumnName("customer_id").HasColumnType("BINARY(16)").IsRequired();
             entity.Property(e => e.TechId).HasColumnName("tech_id").HasColumnType("BINARY(16)");
+            entity.Property(e => e.Priority).HasColumnName("priority").HasColumnType("ENUM('Baja', 'Media', 'Alta', 'Critica')").HasConversion(v => v.ToString(), v => Enum.Parse<TicketPriority>(v));
+            entity.Property(e => e.Category).HasColumnName("category").HasColumnType("ENUM('General', 'Hardware', 'Software', 'Redes', 'Acceso')").HasConversion(v => v.ToString(), v => Enum.Parse<TicketCategory>(v));
         });
         modelBuilder.Entity<Roles>(entity => // Roles
         {

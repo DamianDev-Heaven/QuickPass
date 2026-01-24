@@ -23,6 +23,8 @@ namespace QuickPass.Application.Services
                 Description = request.Description ?? string.Empty,
                 CustomerId = customerId,
                 Status = TicketStatus.Abierto,
+                Priority = request.Priority,
+                Category = request.Category,
                 TechId = null
             };
 
@@ -34,10 +36,13 @@ namespace QuickPass.Application.Services
                 Title = saved.Title,
                 Description = saved.Description,
                 Status = saved.Status.ToString(),
+                Priority = saved.Priority.ToString(),
+                Category = saved.Category.ToString(),
                 CustomerId = saved.CustomerId,
                 TechId = saved.TechId
             };
         }
+
 
         public async Task<List<TicketResponse>> GetMineAsync(Guid customerId)
         {
