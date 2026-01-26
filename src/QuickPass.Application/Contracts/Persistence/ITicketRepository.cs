@@ -14,6 +14,7 @@ namespace QuickPass.Application.Contracts.Persistence
 
         // UPDATE
         Task AssignTechAsync(Guid ticketId, Guid techAccountId, Guid modifiedBy, string? comment);
+        Task UnAssignTech(Guid ticketId, Guid techAccountId, Guid modifiedBy, string? comment);
         Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment);

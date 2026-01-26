@@ -11,6 +11,7 @@ using QuickPass.Application.DTOs;
 using QuickPass.Application.Services;
 using QuickPass.Domain.Entities;
 using QuickPass.Infrastructure.Data;
+using QuickPass.Infrastructure.ExceptionHandlers;
 using QuickPass.Infrastructure.Identity;
 using QuickPass.Infrastructure.Persistence;
 using QuickPass.Infrastructure.Persistence.Repositories;
@@ -25,6 +26,8 @@ namespace QuickPass.Infrastructure
             var con = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(con, ServerVersion.AutoDetect(con)));
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
             services.AddScoped<ITicketRepository, TicketRepository>();
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<IAuthService, AuthService>();

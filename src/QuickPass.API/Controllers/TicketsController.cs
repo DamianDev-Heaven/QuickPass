@@ -29,6 +29,7 @@ namespace QuickPass.API.Controllers
             if (IsTech)
             {
                 var allAssigned = await _ticketService.GetAssignedAsync(AccountId);
+                // Filtro en memoria (podría optimizarse en DB después)
                 var myAssigned = allAssigned.Where(t => t.TechId == AccountId).ToList();
                 return Ok(myAssigned);
             }
@@ -41,8 +42,6 @@ namespace QuickPass.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var ticket = await _ticketService.GetByIdAsync(id);
-            if (ticket == null) return NotFound();
-
             if (ticket.CustomerId != AccountId && !IsAdmin && !IsTech)
             {
                 return Forbid();
@@ -60,16 +59,25 @@ namespace QuickPass.API.Controllers
 
         [HttpPut("{id}/claim")]
         [Authorize(Roles = "Tecnico,Administrador")]
-        [SwaggerOperation(Summary = "Auto-asignarse ticket (Técnicos)", Description = "El técnico actual toma responsabilidad del ticket.")]
+        [SwaggerOperation(Summary = "Auto-asignarse ticket")]
         public async Task<IActionResult> Claim(Guid id, [FromBody] TicketActionRequest request)
         {
             await _ticketService.AssignTechAsync(id, AccountId, AccountId, request.Comment);
             return NoContent();
         }
 
+        [HttpPut("{id}/unclaim")]
+        [Authorize(Roles = "Tecnico,Administrador")]
+        [SwaggerOperation(Summary = "Auto-desasignarse ticket")]
+        public async Task<IActionResult> Unclaim(Guid id, [FromBody] TicketActionRequest request)
+        {
+            await _ticketService.UnAssignTech(id, AccountId, AccountId, request.Comment);
+            return NoContent();
+        }
+
         [HttpPut("{id}/resolve")]
         [Authorize(Roles = "Tecnico,Administrador")]
-        [SwaggerOperation(Summary = "Resolver ticket (Técnicos)", Description = "Marca el ticket como resuelto.")]
+        [SwaggerOperation(Summary = "Resolver ticket")]
         public async Task<IActionResult> Resolve(Guid id, [FromBody] TicketActionRequest request)
         {
             await _ticketService.ResolveAsync(id, AccountId, request.Comment);
@@ -78,18 +86,16 @@ namespace QuickPass.API.Controllers
 
         [HttpPut("{id}/assign")]
         [Authorize(Roles = "Administrador")]
-        [SwaggerOperation(Summary = "Asignar técnico manualmente (Admin)", Description = "Fuerza la asignación de un ticket a un técnico específico.")]
+        [SwaggerOperation(Summary = "Asignar técnico manualmente (Admin)")]
         public async Task<IActionResult> AssignToTech(Guid id, [FromBody] AssignTechRequest request)
         {
-            if (request.TechId == Guid.Empty) return BadRequest("ID de técnico inválido.");
-
             await _ticketService.AssignTechAsync(id, request.TechId, AccountId, request.Comment);
             return NoContent();
         }
 
         [HttpPut("{id}/force-close")]
         [Authorize(Roles = "Administrador")]
-        [SwaggerOperation(Summary = "Forzar cierre (Admin)", Description = "Cierra un ticket administrativamente, ignorando el flujo normal.")]
+        [SwaggerOperation(Summary = "Forzar cierre (Admin)")]
         public async Task<IActionResult> ForceClose(Guid id, [FromBody] TicketActionRequest request)
         {
             await _ticketService.CloseAsync(id, AccountId, request.Comment ?? "Cierre forzado por Admin");
@@ -97,7 +103,7 @@ namespace QuickPass.API.Controllers
         }
 
         [HttpPut("{id}/close")]
-        [SwaggerOperation(Summary = "Cerrar ticket (Usuario)", Description = "El usuario confirma que su problema fue solucionado.")]
+        [SwaggerOperation(Summary = "Cerrar ticket (Usuario)")]
         public async Task<IActionResult> Close(Guid id, [FromBody] TicketActionRequest request)
         {
             await _ticketService.CloseAsync(id, AccountId, request.Comment);
@@ -105,7 +111,7 @@ namespace QuickPass.API.Controllers
         }
 
         [HttpPut("{id}/reopen")]
-        [SwaggerOperation(Summary = "Reabrir ticket (Usuario)", Description = "El usuario reabre un ticket si el problema persiste.")]
+        [SwaggerOperation(Summary = "Reabrir ticket (Usuario)")]
         public async Task<IActionResult> Reopen(Guid id, [FromBody] TicketActionRequest request)
         {
             await _ticketService.ReopenAsync(id, AccountId, request.Comment);
