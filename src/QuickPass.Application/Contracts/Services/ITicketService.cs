@@ -8,13 +8,14 @@ namespace QuickPass.Application.Contracts.Services
         Task<TicketResponse> CreateAsync(CreateTRequest request, Guid customerId);
 
         // READ
-        Task<TicketResponse?> GetByIdAsync(Guid id);
+        Task<TicketResponse> GetByIdAsync(Guid id);
         Task<List<TicketResponse>> GetMineAsync(Guid customerId);
         Task<List<TicketResponse>> GetAllAsync();
         Task<List<TicketResponse>> GetAssignedAsync(Guid techId);
 
         // UPDATE
         Task AssignTechAsync(Guid ticketId, Guid techId, Guid modifiedBy, string? comment);
+        Task UnAssignTech(Guid ticketId, Guid techId, Guid modifiedBy, string? comment);
         Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment);

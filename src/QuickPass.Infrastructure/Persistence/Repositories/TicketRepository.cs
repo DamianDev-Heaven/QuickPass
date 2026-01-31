@@ -40,6 +40,15 @@ namespace QuickPass.Infrastructure.Persistence.Repositories
             _appDbContext.tickets.Update(ticket);
             await _appDbContext.SaveChangesAsync();
         }
+        public async Task UnAssignTech(Guid ticketId, Guid techId, Guid modifiedBy, string? comment)
+        {
+            var ticket = await GetByIdAsync(ticketId);
+            if (ticket == null) throw new InvalidOperationException($"Ticket con ID {ticketId} no encontrado");
+            ticket.TechId = null;
+            ticket.Status = TicketStatus.Abierto;
+            _appDbContext.tickets.Update(ticket);
+            await _appDbContext.SaveChangesAsync();
+        }
         public async Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment)
         {
             var ticket = await GetByIdAsync(ticketId);
