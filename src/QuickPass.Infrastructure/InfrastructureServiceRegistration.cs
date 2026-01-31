@@ -6,55 +6,54 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using QuickPass.Application.Contracts.Identity;
 using QuickPass.Application.Contracts.Persistence;
-using QuickPass.Application.Contracts.Services;
 using QuickPass.Application.DTOs;
-using QuickPass.Application.Services;
 using QuickPass.Domain.Entities;
 using QuickPass.Infrastructure.Data;
 using QuickPass.Infrastructure.ExceptionHandlers;
 using QuickPass.Infrastructure.Identity;
-using QuickPass.Infrastructure.Persistence;
 using QuickPass.Infrastructure.Persistence.Repositories;
 using System.Text;
 
-namespace QuickPass.Infrastructure
+namespace QuickPass.Infrastructure;
+
+public static class InfrastructureServiceRegistration
 {
-    public static class InfrastructureServiceRegistration
+    public static IServiceCollection AddInfrastructureService(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructureService(this IServiceCollection services, IConfiguration configuration)
-        {
-            var con = configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<AppDbContext>(options =>
+        var con = configuration.GetConnectionString("DefaultConnection");
+
+        services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(con, ServerVersion.AutoDetect(con)));
-            services.AddExceptionHandler<GlobalExceptionHandler>();
-            services.AddProblemDetails();
-            services.AddScoped<ITicketRepository, TicketRepository>();
-            services.AddScoped<ITicketService, TicketService>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
-            var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
-            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings!.Issuer,
-                    ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
-                };
-            });
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
 
-            return services;
-        }
+        services.AddScoped<ITicketRepository, TicketRepository>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
+
+        var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
+        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings!.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+            };
+        });
+
+        return services;
     }
 }
