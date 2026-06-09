@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -36,14 +36,14 @@ namespace QuickPass.Infrastructure.Identity
                 var newAccount = new Account
                 {
                     Email = request.Email.ToLower(),
-                    RolId = RolUser.idRol
+                    RolId = RolUser.IdRol
                 };
                 //Hashing de la contraseña
                 newAccount.Pass = _passwordHasher.HashPassword(newAccount, request.Pass);
                 _appDbContext.account.Add(newAccount);
                 await _appDbContext.SaveChangesAsync();
 
-                var newUser = new Users
+                var newUser = new User
                 {
                     NameUser = request.NameUser,
                     AccId = newAccount.accId
@@ -87,13 +87,13 @@ namespace QuickPass.Infrastructure.Identity
             return acc;
         }
 
-        public async Task<Users> FindUsAcc(Guid accId)
+        public async Task<User> FindUsAcc(Guid accId)
         {
             var user = await _appDbContext.users.SingleOrDefaultAsync(u => u.AccId == accId);
             return user ?? throw new InvalidOperationException("Cuenta sin usuario asociado");
         }
 
-        private string GenToken(Account acc, Users usr)
+        private string GenToken(Account acc, User usr)
         {
             var claims = new List<Claim>
             {

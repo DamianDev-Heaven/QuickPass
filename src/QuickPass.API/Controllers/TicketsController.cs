@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickPass.Application.Contracts.Services;
 using QuickPass.Application.DTOs.Tickets;
@@ -28,10 +28,7 @@ namespace QuickPass.API.Controllers
 
             if (IsTech)
             {
-                var allAssigned = await _ticketService.GetAssignedAsync(AccountId);
-                // Filtro en memoria (podría optimizarse en DB después)
-                var myAssigned = allAssigned.Where(t => t.TechId == AccountId).ToList();
-                return Ok(myAssigned);
+                return Ok(await _ticketService.GetAssignedAsync(AccountId));
             }
 
             return Ok(await _ticketService.GetMineAsync(AccountId));
@@ -115,6 +112,42 @@ namespace QuickPass.API.Controllers
         public async Task<IActionResult> Reopen(Guid id, [FromBody] TicketActionRequest request)
         {
             await _ticketService.ReopenAsync(id, AccountId, request.Comment);
+            return NoContent();
+        }
+
+        [HttpGet("{id}/history")]
+        [SwaggerOperation(Summary = "Obtener historial y comentarios del ticket")]
+        public async Task<IActionResult> GetHistory(Guid id)
+        {
+            var ticket = await _ticketService.GetByIdAsync(id);
+            if (ticket.CustomerId != AccountId && !IsAdmin && !IsTech)
+            {
+                return Forbid();
+            }
+
+            var history = await _ticketService.GetHistoryAsync(id);
+            return Ok(history);
+        }
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Modificar un ticket existente (Solo creador si está abierto)")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTRequest request)
+        {
+            var ticket = await _ticketService.GetByIdAsync(id);
+            if (ticket.CustomerId != AccountId)
+            {
+                return Forbid();
+            }
+
+            var updated = await _ticketService.UpdateAsync(id, request, AccountId);
+            return Ok(updated);
+        }
+
+        [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Eliminar un ticket (Solo creador si está abierto, o Administrador)")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _ticketService.DeleteAsync(id, AccountId, IsAdmin);
             return NoContent();
         }
     }

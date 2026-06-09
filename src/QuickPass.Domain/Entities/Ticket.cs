@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +16,7 @@ namespace QuickPass.Domain.Entities
         public Guid? TechId { get; set; }
         public TicketPriority Priority { get; set; } = TicketPriority.Media;
         public TicketCategory Category { get; set; } = TicketCategory.General;
+        public virtual ICollection<TicketHistory> Histories { get; set; } = new List<TicketHistory>();
     }
 
     public enum TicketStatus

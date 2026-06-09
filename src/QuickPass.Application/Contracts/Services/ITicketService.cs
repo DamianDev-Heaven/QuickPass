@@ -1,4 +1,4 @@
-﻿using QuickPass.Application.DTOs.Tickets;
+using QuickPass.Application.DTOs.Tickets;
 
 namespace QuickPass.Application.Contracts.Services
 {
@@ -19,5 +19,8 @@ namespace QuickPass.Application.Contracts.Services
         Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment);
+        Task<List<TicketHistoryResponse>> GetHistoryAsync(Guid ticketId);
+        Task<TicketResponse> UpdateAsync(Guid ticketId, UpdateTRequest request, Guid modifiedBy);
+        Task DeleteAsync(Guid ticketId, Guid modifiedBy, bool isAdmin);
     }
 }
