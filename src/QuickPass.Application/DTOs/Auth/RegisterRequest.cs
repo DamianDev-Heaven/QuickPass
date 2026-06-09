@@ -1,4 +1,4 @@
-﻿namespace QuickPass.Application.DTOs.Auth
+namespace QuickPass.Application.DTOs.Auth
 {
     public class RegisterRequest
     {
@@ -6,7 +6,7 @@
         public string Email { get; set; } = string.Empty;
         public string Pass { get; set; } = string.Empty;
         public bool OtherMed { get; set; } = false;
-        // Datos de Users
+        // Datos de User
         public string NameUser { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? UrlPic { get; set; }

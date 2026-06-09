@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -42,6 +42,20 @@ public class GlobalExceptionHandler : IExceptionHandler
             problemDetails.Detail = "Uno o más campos no cumplen las reglas.";
             problemDetails.Status = StatusCodes.Status400BadRequest;
             problemDetails.Extensions.Add("errors", validationEx.Errors);
+        }
+        else if (exception is UnauthorizedAccessException unauthorizedEx)
+        {
+            httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+            problemDetails.Title = "Acceso denegado";
+            problemDetails.Detail = unauthorizedEx.Message;
+            problemDetails.Status = StatusCodes.Status403Forbidden;
+        }
+        else if (exception is InvalidOperationException invalidOpEx)
+        {
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            problemDetails.Title = "Operación no válida";
+            problemDetails.Detail = invalidOpEx.Message;
+            problemDetails.Status = StatusCodes.Status400BadRequest;
         }
         else
         {

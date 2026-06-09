@@ -1,4 +1,4 @@
-﻿using QuickPass.Domain.Entities;
+using QuickPass.Domain.Entities;
 
 namespace QuickPass.Application.Contracts.Persistence
 {
@@ -18,8 +18,10 @@ namespace QuickPass.Application.Contracts.Persistence
         Task ResolveAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task CloseAsync(Guid ticketId, Guid modifiedBy, string? comment);
         Task ReopenAsync(Guid ticketId, Guid modifiedBy, string? comment);
+        Task UpdateAsync(Ticket ticket, Guid modifiedBy, string? comment);
+        Task DeleteAsync(Guid ticketId);
 
-        // HISTORY Pendiente
-        // Task<List<TicketHistory>> GetHistoryAsync(Guid ticketId);
+        // HISTORY
+        Task<List<TicketHistory>> GetHistoryAsync(Guid ticketId);
     }
 }

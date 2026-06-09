@@ -1,4 +1,4 @@
-﻿using QuickPass.Application.Contracts.Persistence;
+using QuickPass.Application.Contracts.Persistence;
 using QuickPass.Application.Contracts.Services;
 using QuickPass.Application.DTOs.Tickets;
 using QuickPass.Domain.Entities;
@@ -114,6 +114,49 @@ namespace QuickPass.Application.Services
 
             await _repo.ReopenAsync(ticketId, modifiedBy, comment);
         }
+        public async Task<List<TicketHistoryResponse>> GetHistoryAsync(Guid ticketId)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+            if (ticket == null)
+                throw new NotFoundException("Ticket", ticketId);
+
+            var histories = await _repo.GetHistoryAsync(ticketId);
+            return histories.Select(MapHistoryToDto).ToList();
+        }
+        public async Task<TicketResponse> UpdateAsync(Guid ticketId, UpdateTRequest request, Guid modifiedBy)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+            if (ticket == null)
+                throw new NotFoundException("Ticket", ticketId);
+
+            if (ticket.Status != TicketStatus.Abierto)
+                throw new InvalidOperationException("Solo se pueden modificar tickets en estado Abierto.");
+
+            if (ticket.CustomerId != modifiedBy)
+                throw new UnauthorizedAccessException("No tienes permisos para modificar este ticket.");
+
+            ticket.Title = request.Title;
+            ticket.Description = request.Description ?? string.Empty;
+            ticket.Priority = request.Priority;
+            ticket.Category = request.Category;
+
+            await _repo.UpdateAsync(ticket, modifiedBy, "Ticket actualizado por el usuario.");
+            return MapToDto(ticket);
+        }
+        public async Task DeleteAsync(Guid ticketId, Guid modifiedBy, bool isAdmin)
+        {
+            var ticket = await _repo.GetByIdAsync(ticketId);
+            if (ticket == null)
+                throw new NotFoundException("Ticket", ticketId);
+
+            if (!isAdmin && ticket.CustomerId != modifiedBy)
+                throw new UnauthorizedAccessException("No tienes permisos para eliminar este ticket.");
+
+            if (!isAdmin && ticket.Status != TicketStatus.Abierto)
+                throw new InvalidOperationException("Solo se pueden eliminar tickets en estado Abierto.");
+
+            await _repo.DeleteAsync(ticketId);
+        }
         private static TicketResponse MapToDto(Ticket t)
         {
             return new TicketResponse
@@ -126,6 +169,19 @@ namespace QuickPass.Application.Services
                 Category = t.Category.ToString(),
                 CustomerId = t.CustomerId,
                 TechId = t.TechId
+            };
+        }
+        private static TicketHistoryResponse MapHistoryToDto(TicketHistory h)
+        {
+            return new TicketHistoryResponse
+            {
+                Id = h.Id,
+                TicketId = h.TicketId,
+                ModifiedBy = h.ModifiedBy,
+                PrevStatus = h.PrevStatus?.ToString(),
+                NewStatus = h.NewStatus.ToString(),
+                Comment = h.Comment,
+                ChangedAt = h.ChangedAt
             };
         }
     }

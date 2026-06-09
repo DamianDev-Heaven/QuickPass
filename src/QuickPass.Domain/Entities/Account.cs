@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +14,7 @@ namespace QuickPass.Domain.Entities
         public bool OtherMed { get; set; }
         public Guid RolId { get; set; }
         // Navegacion
-        public virtual Roles? Role { get; set; }
+        public virtual Role? Role { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
